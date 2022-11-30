@@ -1,0 +1,29 @@
+Capstone Two - Green Thumb
+
+Tech Stack: NodeJS (backend) & React (frontend)
+Going for a balanced fullstack application, verification on server side
+Standard web app (a mobile app would be awesome though)
+
+Project Goal: Web app to manage vegetable garden plant/harvest schedule
+Will plan to create my own API that users can add to (and potentially search what other crops users have added and then add to their garden)
+Home page will be either a user dashboard with a calendar populated with crops they’ve added (prob use localStorage) or a sign up page (if not logged in)
+I will include a test user account for future recruiters 
+Targeted toward users that need help managing schedules and potentially setting up email alerts (need to look into this)
+
+Schema: 
+Users table
+Id
+Username
+Password
+Email
+savedCrops
+
+Crops table:
+Id
+Name
+germTime
+userId (that added crop)
+
+SavedCrops table:
+userId
+cropId
