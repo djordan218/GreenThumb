@@ -31,3 +31,4 @@ I always plant something in the spring time and then completely forget about whe
 ## API
 
 - creating my own API
+- stored in database

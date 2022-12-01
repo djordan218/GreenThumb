@@ -12,18 +12,33 @@ Targeted toward users that need help managing schedules and potentially setting 
 
 Schema: 
 Users table
-Id
-Username
+Id(PK)
+Username(unique)
 Password
-Email
+Email(unique)
 savedCrops
 
 Crops table:
-Id
-Name
-germTime
-userId (that added crop)
+Id(PK)
+Name(unique)
+Description
+timeToGerminate
+timeToHarvest
+img
+userId (that added crop)(FK)
 
 SavedCrops table:
-userId
-cropId
+userId(FK)
+cropId(FK)
+
+Site features to be implemented:
+- tips and tricks for planting
+- checklist of soil prep 
+
+Site Components 
+- App 
+- Navbar 
+- Routes 
+- User Profile 
+- Crops 
+- Crop 

@@ -1,0 +1,13 @@
+{
+  "$schema": "http://json-schema.org/draft-01/schema#",
+  "$id": "http://greenthumb.com/cropSearch.schema.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": false,
+  "required": []
+}

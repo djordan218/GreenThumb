@@ -1,6 +1,6 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "http://example.com/example.json",
+  "$schema": "http://json-schema.org/draft-01/schema",
+  "$id": "https://greenthumb.com/userRegister.schema.json",
   "type": "object",
   "properties": {
     "username": {
@@ -13,15 +13,10 @@
       "minLength": 5,
       "maxLength": 20
     },
-    "firstName": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 30
-    },
-    "lastName": {
-      "type": "string",
-      "minLength": 1,
-      "maxLength": 30
+    "zone": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 13
     },
     "email": {
       "type": "string",
@@ -31,11 +26,5 @@
     }
   },
   "additionalProperties": false,
-  "required": [
-    "username",
-    "firstName",
-    "lastName",
-    "password",
-    "email"
-  ]
+  "required": ["username", "password", "zone", "email"]
 }

@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-01/schema#",
+  "$id": "http://greenthumb.com/cropNew.schema.json",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "timeToGerm": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "timeToHarvest": {
+      "type": "integers",
+      "minimum": 0
+    },
+    "img": {
+      "type": "string",
+      "format": "url"
+    }
+  },
+  "additionalProperties": false,
+  "required": ["name", "timeToGerm", "timeToHarvest"]
+}
