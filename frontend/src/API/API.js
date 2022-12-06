@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const BASE_API_URL = 'http://localhost:3001';
 
-// const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:3001';
+const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:3001';
 
 class API {
   // the token for interactive with the API will be stored here.
