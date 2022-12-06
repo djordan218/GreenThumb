@@ -9,7 +9,7 @@ tags:
 
 # What does this app do?
 
-I always plant something in the spring time and then completely forget about when I'm supposed to be harvesting something. There are also times in the year when I am late planting seeds indoors because I just forget about it. This web app is meant to be the brain behind that and make sure that I know when things are supposed to be planted and when to expect to harvest them.
+I always plant something in my garden and have no idea what is "typical" after that. Not sure when to harvest, how long it takes for each seed to germinate, or just general information about a specific crop. This web app is meant to be a gardening manager. A user can add crops to their "garden", remove them, add crops to the database (as well as edit them and remove them.)
 
 ## ✨ Features
 
@@ -26,7 +26,6 @@ I always plant something in the spring time and then completely forget about whe
 - Visit the site.
 - Create an account.
 - Add plants that you want to have in your garden.
-- Sign up for email alerts if you want to make sure you sow seeds/plant in time!
 
 ## API
 
