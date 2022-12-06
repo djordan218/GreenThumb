@@ -15,6 +15,7 @@ Users table
 Id(PK)
 Username(unique)
 Password
+Zone (display a map for reference in signup)
 Email(unique)
 savedCrops
 

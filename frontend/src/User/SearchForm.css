@@ -1,0 +1,26 @@
+.SearchForm {
+  display: flex;
+  flex-direction: column;
+  margin-top: 15px;
+}
+
+.SearchField {
+  width: 100%;
+  text-align: center;
+}
+
+.SearchField:focus {
+  border-color: rgb(6, 190, 0) !important;
+  box-shadow: none !important;
+}
+
+.center-block {
+  margin: 0 auto;
+  display: block;
+}
+
+.search-btn {
+  width: 100%;
+  margin-top: -10px;
+  margin-bottom: -8px;
+}

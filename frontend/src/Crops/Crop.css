@@ -1,0 +1,104 @@
+.crop-card {
+  height: 50vh;
+  margin-bottom: 40px;
+}
+
+.card-info {
+  box-sizing: content-box;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+.crop-btn {
+  margin-top: 7px;
+}
+
+.crop-img {
+  height: auto;
+  width: 300px;
+}
+
+.crop-body {
+  margin: -15px;
+}
+
+.crop-title {
+  margin-top: 5px;
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+  position: relative;
+}
+
+.harvest-title {
+  font-weight: bolder;
+  margin-top: 4px;
+  border-top: 2px solid black;
+  border-bottom: 2px solid black;
+}
+
+.crop-days-top {
+  font-size: 80%;
+  font-weight: 400;
+  margin-top: 5px;
+}
+
+.crop-days {
+  font-weight: 400;
+  font-size: 80%;
+}
+
+.crop-delete-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  height: 10px;
+  padding-left: 2px;
+  padding-right: 2px;
+  top: 0px;
+  right: 0px;
+  z-index: 1;
+  border: solid 2px black;
+}
+
+.crop-edit-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  height: 12px;
+  width: 23px;
+  padding-left: 2px;
+  padding-right: 2px;
+  top: 0px;
+  left: 0px;
+  z-index: 1;
+  border: solid 2px black;
+}
+
+.crop-edit-btn img {
+  z-index: 4;
+  color: white;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}

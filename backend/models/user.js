@@ -1,22 +1,22 @@
-"use strict";
+'use strict';
 
-const db = require("../db");
-const bcrypt = require("bcrypt");
-const { sqlForPartialUpdate } = require("../helpers/sql");
+const db = require('../db');
+const bcrypt = require('bcrypt');
+const { sqlForPartialUpdate } = require('../helpers/sql');
 const {
   NotFoundError,
   BadRequestError,
   UnauthorizedError,
-} = require("../expressError");
+} = require('../expressError');
 
-const { BCRYPT_WORK_FACTOR } = require("../config.js");
+const { BCRYPT_WORK_FACTOR } = require('../config.js');
 
 /** Related functions for users. */
 
 class User {
   /** authenticate user with username, password.
    *
-   * Returns { username, first_name, last_name, email, is_admin }
+   * Returns { username, zone, email, is_admin }
    *
    * Throws UnauthorizedError is user not found or wrong password.
    **/
@@ -24,15 +24,14 @@ class User {
   static async authenticate(username, password) {
     // try to find the user first
     const result = await db.query(
-          `SELECT username,
+      `SELECT username,
                   password,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
+                  zone,
                   email,
-                  is_admin AS "isAdmin"
+                  is_admin
            FROM users
            WHERE username = $1`,
-        [username],
+      [username]
     );
 
     const user = result.rows[0];
@@ -46,23 +45,22 @@ class User {
       }
     }
 
-    throw new UnauthorizedError("Invalid username/password");
+    throw new UnauthorizedError('Invalid username/password');
   }
 
   /** Register user with data.
    *
-   * Returns { username, firstName, lastName, email, isAdmin }
+   * Returns { username, zone, email, isAdmin }
    *
    * Throws BadRequestError on duplicates.
    **/
 
-  static async register(
-      { username, password, firstName, lastName, email, isAdmin }) {
+  static async register({ username, password, zone, email, is_admin }) {
     const duplicateCheck = await db.query(
-          `SELECT username
+      `SELECT username
            FROM users
            WHERE username = $1`,
-        [username],
+      [username]
     );
 
     if (duplicateCheck.rows[0]) {
@@ -72,23 +70,15 @@ class User {
     const hashedPassword = await bcrypt.hash(password, BCRYPT_WORK_FACTOR);
 
     const result = await db.query(
-          `INSERT INTO users
+      `INSERT INTO users
            (username,
             password,
-            first_name,
-            last_name,
+            zone,
             email,
             is_admin)
-           VALUES ($1, $2, $3, $4, $5, $6)
-           RETURNING username, first_name AS "firstName", last_name AS "lastName", email, is_admin AS "isAdmin"`,
-        [
-          username,
-          hashedPassword,
-          firstName,
-          lastName,
-          email,
-          isAdmin,
-        ],
+           VALUES ($1, $2, $3, $4, $5)
+           RETURNING username, zone, email, is_admin`,
+      [username, hashedPassword, zone, email, is_admin]
     );
 
     const user = result.rows[0];
@@ -98,18 +88,18 @@ class User {
 
   /** Find all users.
    *
-   * Returns [{ username, first_name, last_name, email, is_admin }, ...]
+   * Returns [{ id, username, zone, email, is_admin }, ...]
    **/
 
   static async findAll() {
     const result = await db.query(
-          `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
+      `SELECT id,
+                  username,
+                  zone,
                   email,
-                  is_admin AS "isAdmin"
+                  is_admin
            FROM users
-           ORDER BY username`,
+           ORDER BY id`
     );
 
     return result.rows;
@@ -117,34 +107,41 @@ class User {
 
   /** Given a username, return data about user.
    *
-   * Returns { username, first_name, last_name, is_admin, jobs }
-   *   where jobs is { id, title, company_handle, company_name, state }
+   * Returns { username, zone, email, is_admin, jobs }
    *
    * Throws NotFoundError if user not found.
    **/
 
   static async get(username) {
     const userRes = await db.query(
-          `SELECT username,
-                  first_name AS "firstName",
-                  last_name AS "lastName",
+      `SELECT id, 
+                  username,
+                  zone,
                   email,
-                  is_admin AS "isAdmin"
+                  is_admin
            FROM users
            WHERE username = $1`,
-        [username],
+      [username]
     );
 
+    const userId = userRes.rows[0].id;
+
+    const savedCropsRes = await db.query(
+      `SELECT crop_id FROM saved_crops WHERE user_id = $1 ORDER BY crop_id`,
+      [userId]
+    );
+    const saved_crops = savedCropsRes.rows;
+    let cropArr = saved_crops.map(({ crop_id }) => {
+      return crop_id;
+    });
     const user = userRes.rows[0];
+    user.saved_crops = cropArr;
 
-    if (!user) throw new NotFoundError(`No user: ${username}`);
+    if (!user)
+      throw new NotFoundError(
+        `We got a problem. ${username} does not exist to me.`
+      );
 
-    const userApplicationsRes = await db.query(
-          `SELECT a.job_id
-           FROM applications AS a
-           WHERE a.username = $1`, [username]);
-
-    user.applications = userApplicationsRes.rows.map(a => a.job_id);
     return user;
   }
 
@@ -166,27 +163,26 @@ class User {
    */
 
   static async update(username, data) {
+    console.log(username, data);
     if (data.password) {
       data.password = await bcrypt.hash(data.password, BCRYPT_WORK_FACTOR);
     }
 
-    const { setCols, values } = sqlForPartialUpdate(
-        data,
-        {
-          firstName: "first_name",
-          lastName: "last_name",
-          isAdmin: "is_admin",
-        });
-    const usernameVarIdx = "$" + (values.length + 1);
+    const { setCols, values } = sqlForPartialUpdate(data, {
+      username: 'username',
+      zone: 'zone',
+      email: 'email',
+      is_admin: 'is_admin',
+    });
+    const usernameVarIdx = '$' + (values.length + 1);
 
     const querySql = `UPDATE users 
                       SET ${setCols} 
                       WHERE username = ${usernameVarIdx} 
                       RETURNING username,
-                                first_name AS "firstName",
-                                last_name AS "lastName",
+                                zone,
                                 email,
-                                is_admin AS "isAdmin"`;
+                                is_admin`;
     const result = await db.query(querySql, [...values, username]);
     const user = result.rows[0];
 
@@ -198,48 +194,156 @@ class User {
 
   /** Delete given user from database; returns undefined. */
 
-  static async remove(username) {
+  static async delete(username) {
     let result = await db.query(
-          `DELETE
+      `DELETE
            FROM users
            WHERE username = $1
            RETURNING username`,
-        [username],
+      [username]
     );
     const user = result.rows[0];
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 
-  /** Apply for job: update db, returns undefined.
-   *
-   * - username: username applying for job
-   * - jobId: job id
-   **/
-
-  static async applyToJob(username, jobId) {
-    const preCheck = await db.query(
-          `SELECT id
-           FROM jobs
-           WHERE id = $1`, [jobId]);
-    const job = preCheck.rows[0];
-
-    if (!job) throw new NotFoundError(`No job: ${jobId}`);
-
-    const preCheck2 = await db.query(
-          `SELECT username
+  // add crop to database, store user that created the crop so they can delete/edit it later on
+  static async addCropToDB(userId, data) {
+    const userCheck = await db.query(
+      `SELECT id
            FROM users
-           WHERE username = $1`, [username]);
-    const user = preCheck2.rows[0];
+           WHERE id = $1`,
+      [userId]
+    );
+    const user = userCheck.rows[0];
+
+    if (!user) throw new NotFoundError(`No username: ${userId}`);
+
+    await db.query(
+      `INSERT INTO crops (name, description, days_to_germ, days_to_harvest, when_to_harvest, img, user_id)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [
+        data.name,
+        data.description,
+        data.days_to_germ,
+        data.days_to_harvest,
+        data.when_to_harvest,
+        data.img,
+        userId,
+      ]
+    );
+  }
+
+  // add crop to a user's garden
+  // checks for crop and user for verification
+  static async addCropToGarden(userId, cropId) {
+    const cropCheck = await db.query(
+      `SELECT id
+           FROM crops
+           WHERE id = $1`,
+      [cropId]
+    );
+    const crop = cropCheck.rows[0];
+
+    if (!crop) throw new NotFoundError(`No crop: ${cropId}`);
+
+    const userCheck = await db.query(
+      `SELECT id
+           FROM users
+           WHERE id = $1`,
+      [userId]
+    );
+    const user = userCheck.rows[0];
 
     if (!user) throw new NotFoundError(`No username: ${username}`);
 
     await db.query(
-          `INSERT INTO applications (job_id, username)
+      `INSERT INTO saved_crops (user_id, crop_id)
            VALUES ($1, $2)`,
-        [jobId, username]);
+      [userId, cropId]
+    );
+  }
+
+  static async deleteCropFromDB(cropId) {
+    const cropCheck = await db.query(
+      `SELECT id
+           FROM crops
+           WHERE id = $1`,
+      [cropId]
+    );
+    const crop = cropCheck.rows[0];
+
+    if (!crop) throw new NotFoundError(`No crop: ${cropId}`);
+
+    let result = await db.query(
+      `DELETE
+           FROM crops
+           WHERE id = $1`,
+      [cropId]
+    );
+    return result;
+  }
+
+  static async editCropInDB(userId, cropId, data) {
+    const cropCheck = await db.query(
+      `SELECT id
+           FROM crops
+           WHERE id = $1`,
+      [cropId]
+    );
+    const crop = cropCheck.rows[0];
+
+    if (!crop) throw new NotFoundError(`No crop: ${cropId}`);
+
+    let result = await db.query(
+      `UPDATE crops
+      SET name = $2, description = $3, days_to_germ = $4, days_to_harvest = $5, when_to_harvest = $6, img = $7, user_id = $8
+           WHERE id = $1`,
+      [
+        cropId,
+        data.name,
+        data.description,
+        data.days_to_germ,
+        data.days_to_harvest,
+        data.when_to_harvest,
+        data.img,
+        userId,
+      ]
+    );
+    console.log('done');
+    return result;
+  }
+
+  static async removeUserCropFromGarden(userId, cropId) {
+    const cropCheck = await db.query(
+      `SELECT id
+           FROM crops
+           WHERE id = $1`,
+      [cropId]
+    );
+    const crop = cropCheck.rows[0];
+
+    if (!crop) throw new NotFoundError(`No crop: ${cropId}`);
+
+    const userCheck = await db.query(
+      `SELECT id
+           FROM users
+           WHERE id = $1`,
+      [userId]
+    );
+    const user = userCheck.rows[0];
+
+    if (!user) throw new NotFoundError(`No username: ${username}`);
+
+    let result = await db.query(
+      `DELETE
+           FROM saved_crops
+           WHERE user_id = $1
+           AND crop_id = $2`,
+      [userId, cropId]
+    );
+    return result;
   }
 }
-
 
 module.exports = User;

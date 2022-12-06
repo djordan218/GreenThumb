@@ -9,8 +9,8 @@ const { ensureCorrectUserOrAdmin, ensureAdmin } = require('../middleware/auth');
 const { BadRequestError } = require('../expressError');
 const User = require('../models/user');
 const { createToken } = require('../helpers/tokens');
-const userNewSchema = require('../schemas/userNew.json');
-const userUpdateSchema = require('../schemas/userUpdate.json');
+// const userNewSchema = require('../schemas/userNew.json');
+// const userUpdateSchema = require('../schemas/userUpdate.json');
 
 const router = express.Router();
 
@@ -42,14 +42,9 @@ router.post('/', ensureAdmin, async function (req, res, next) {
   }
 });
 
-/** GET / => { users: [ {username, firstName, lastName, email }, ... ] }
- *
- * Returns list of all users.
- *
- * Authorization required: admin
- **/
-
-router.get('/', ensureAdmin, async function (req, res, next) {
+// get all users
+// not available in front end
+router.get('/', async function (req, res, next) {
   try {
     const users = await User.findAll();
     return res.json({ users });
@@ -58,93 +53,99 @@ router.get('/', ensureAdmin, async function (req, res, next) {
   }
 });
 
-/** GET /[username] => { user }
- *
- * Returns { username, firstName, lastName, isAdmin, jobs }
- *   where jobs is { id, title, companyHandle, companyName, state }
- *
- * Authorization required: admin or same user-as-:username
- **/
-
-router.get(
-  '/:username',
-  ensureCorrectUserOrAdmin,
-  async function (req, res, next) {
-    try {
-      const user = await User.get(req.params.username);
-      return res.json({ user });
-    } catch (err) {
-      return next(err);
-    }
+// get a specific user
+// not available in front end
+router.get('/:username', async function (req, res, next) {
+  try {
+    const user = await User.get(req.params.username);
+    return res.json({ user });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
-/** PATCH /[username] { user } => { user }
- *
- * Data can include:
- *   { firstName, lastName, password, email }
- *
- * Returns { username, firstName, lastName, email, isAdmin }
- *
- * Authorization required: admin or same-user-as-:username
- **/
-
-router.patch(
-  '/:username',
-  ensureCorrectUserOrAdmin,
-  async function (req, res, next) {
-    try {
-      const validator = jsonschema.validate(req.body, userUpdateSchema);
-      if (!validator.valid) {
-        const errs = validator.errors.map((e) => e.stack);
-        throw new BadRequestError(errs);
-      }
-
-      const user = await User.update(req.params.username, req.body);
-      return res.json({ user });
-    } catch (err) {
-      return next(err);
-    }
+// edit a user
+router.patch('/:username', async function (req, res, next) {
+  try {
+    const user = await User.update(req.params.username, req.body);
+    return res.json({ user });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
-/** DELETE /[username]  =>  { deleted: username }
- *
- * Authorization required: admin or same-user-as-:username
- **/
-
-router.delete(
-  '/:username',
-  ensureCorrectUserOrAdmin,
-  async function (req, res, next) {
-    try {
-      await User.remove(req.params.username);
-      return res.json({ deleted: req.params.username });
-    } catch (err) {
-      return next(err);
-    }
+// delete user
+router.delete('/:username', async function (req, res, next) {
+  try {
+    await User.delete(req.params.username);
+    return res.json({ deleted: req.params.username });
+  } catch (err) {
+    return next(err);
   }
-);
+});
 
-/** POST /[username]/jobs/[id]  { state } => { application }
- *
- * Returns {"applied": jobId}
- *
- * Authorization required: admin or same-user-as-:username
- * */
-
-router.post(
-  '/:username/jobs/:id',
-  ensureCorrectUserOrAdmin,
-  async function (req, res, next) {
-    try {
-      const jobId = +req.params.id;
-      await User.applyToJob(req.params.username, jobId);
-      return res.json({ applied: jobId });
-    } catch (err) {
-      return next(err);
-    }
+// add a crop to a user's garden
+router.post('/:userId/crops/:id', async function (req, res, next) {
+  try {
+    console.log('add crop to garden', req.params);
+    const cropId = +req.params.id;
+    const userId = +req.params.userId;
+    await User.addCropToGarden(userId, cropId);
+    return res.json({ applied: cropId });
+  } catch (err) {
+    return next(err);
   }
-);
+});
+
+// add crop to the database
+router.post('/crops/add', async function (req, res, next) {
+  try {
+    const crop = req.body.data;
+    const userId = req.body.userId;
+    let result = await User.addCropToDB(userId, crop);
+    return res.json('added crop');
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// edit a crop in the database
+// can only be done by an admin or user that created the crop
+router.patch('/crops/edit/:id', async function (req, res, next) {
+  try {
+    const userId = +req.body.userId;
+    const crop = req.body.data;
+    const cropId = +req.params.id;
+    console.log(userId, crop, cropId);
+    const result = await User.editCropInDB(userId, cropId, crop);
+    return res.json({ result });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// delete crop from the DB
+router.post('/crops/delete/:id', async function (req, res, next) {
+  try {
+    console.log('crop/delete/id');
+    const cropId = +req.params.id;
+    let result = await User.deleteCropFromDB(cropId);
+    return res.json({ 'crop deleted': cropId });
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// Remove crops that are in user's garden
+router.post('/:userId/crops/:id/remove', async function (req, res, next) {
+  try {
+    const userId = +req.params.userId;
+    const cropId = +req.params.id;
+    let result = await User.removeUserCropFromGarden(userId, cropId);
+    return res.json({ 'removed from garden': cropId });
+  } catch (err) {
+    return next(err);
+  }
+});
 
 module.exports = router;

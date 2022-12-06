@@ -1,0 +1,21 @@
+.signup-form {
+  margin-top: 50px;
+  border: 1px solid black;
+  padding: 40px;
+}
+
+.form-h1 {
+  margin-top: 20px;
+  margin-bottom: -15px;
+}
+
+.zones-img {
+  margin-bottom: 10px;
+  border-radius: 70px;
+  width: 70%;
+}
+
+.zone-btn {
+  margin-top: 8px;
+  margin-bottom: -6px;
+}
