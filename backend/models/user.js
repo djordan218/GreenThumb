@@ -14,13 +14,7 @@ const { BCRYPT_WORK_FACTOR } = require('../config.js');
 /** Related functions for users. */
 
 class User {
-  /** authenticate user with username, password.
-   *
-   * Returns { username, zone, email, is_admin }
-   *
-   * Throws UnauthorizedError is user not found or wrong password.
-   **/
-
+  // authenticate a user
   static async authenticate(username, password) {
     // try to find the user first
     const result = await db.query(
@@ -48,13 +42,7 @@ class User {
     throw new UnauthorizedError('Invalid username/password');
   }
 
-  /** Register user with data.
-   *
-   * Returns { username, zone, email, isAdmin }
-   *
-   * Throws BadRequestError on duplicates.
-   **/
-
+  // registering user with form data
   static async register({ username, password, zone, email, is_admin }) {
     const duplicateCheck = await db.query(
       `SELECT username
@@ -86,11 +74,7 @@ class User {
     return user;
   }
 
-  /** Find all users.
-   *
-   * Returns [{ id, username, zone, email, is_admin }, ...]
-   **/
-
+  // finding all users, only available in backend
   static async findAll() {
     const result = await db.query(
       `SELECT id,
@@ -105,13 +89,8 @@ class User {
     return result.rows;
   }
 
-  /** Given a username, return data about user.
-   *
-   * Returns { username, zone, email, is_admin, jobs }
-   *
-   * Throws NotFoundError if user not found.
-   **/
-
+  // getting single user
+  // returns users saved_crops
   static async get(username) {
     const userRes = await db.query(
       `SELECT id, 
@@ -145,23 +124,7 @@ class User {
     return user;
   }
 
-  /** Update user data with `data`.
-   *
-   * This is a "partial update" --- it's fine if data doesn't contain
-   * all the fields; this only changes provided ones.
-   *
-   * Data can include:
-   *   { firstName, lastName, password, email, isAdmin }
-   *
-   * Returns { username, firstName, lastName, email, isAdmin }
-   *
-   * Throws NotFoundError if not found.
-   *
-   * WARNING: this function can set a new password or make a user an admin.
-   * Callers of this function must be certain they have validated inputs to this
-   * or a serious security risks are opened.
-   */
-
+  // updating a user
   static async update(username, data) {
     console.log(username, data);
     if (data.password) {
@@ -192,8 +155,7 @@ class User {
     return user;
   }
 
-  /** Delete given user from database; returns undefined. */
-
+  // deleting a user
   static async delete(username) {
     let result = await db.query(
       `DELETE
@@ -264,6 +226,8 @@ class User {
     );
   }
 
+  // deleting a crop from the DB
+  // can only be done by an admin/user who created it
   static async deleteCropFromDB(cropId) {
     const cropCheck = await db.query(
       `SELECT id
@@ -284,6 +248,7 @@ class User {
     return result;
   }
 
+  // editing crop
   static async editCropInDB(userId, cropId, data) {
     const cropCheck = await db.query(
       `SELECT id
@@ -314,6 +279,7 @@ class User {
     return result;
   }
 
+  // removing a crop from a user's garden
   static async removeUserCropFromGarden(userId, cropId) {
     const cropCheck = await db.query(
       `SELECT id
