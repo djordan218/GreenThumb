@@ -2,8 +2,7 @@ import axios from 'axios';
 
 // NODE_ENV = 'development'
 // NODE_ENV = 'production'
-
-const BASE_API_URL = 'http://localhost:3000';
+const BASE_API_URL = 'http://localhost:3001';
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || BASE_API_URL;
 
