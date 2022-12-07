@@ -4,6 +4,7 @@
 
 require('dotenv').config();
 require('colors');
+const { PGUSER, PGPASSWORD, PGHOST, PGPORT, PGDATABASE } = require('./config');
 
 const SECRET_KEY = process.env.SECRET_KEY || 'secret-dev';
 
