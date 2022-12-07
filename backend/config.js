@@ -11,11 +11,12 @@ const PORT = +process.env.PORT || 3001;
 
 // Use dev database, testing database, or via env var, production database
 function getDatabaseUri() {
-  return process.env.NODE_ENV === 'test'
-    ? `postgresql://${{ PGUSER }}:${{ PGPASSWORD }}@${{ PGHOST }}:${{
-        PGPORT,
-      }}/${{ PGDATABASE }}`
-    : 'postgresql://postgres:password@127.0.0.1:5432/green_thumb';
+  return (
+    process.env.NODE_ENV ===
+    `postgresql://${{ PGUSER }}:${{ PGPASSWORD }}@${{ PGHOST }}:${{
+      PGPORT,
+    }}}/${{ PGDATABASE }}`
+  );
 }
 // function getDatabaseUri() {
 //   return process.env.NODE_ENV === 'test'
