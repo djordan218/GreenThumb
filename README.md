@@ -1,6 +1,6 @@
 ---
 title: Green Thumb
-description: A gardening management tool that prioritizes idea harvest times based on when plants were planted.
+description: A simple gardening management website that users can save, add, edit crops into their garden. Shows typcial germination and harvest times per plant.
 tags:
   - React
   - NodeJS
