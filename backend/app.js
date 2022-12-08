@@ -1,6 +1,6 @@
 'use strict';
 
-/** Express app for jobly. */
+// express app for green_thumb
 
 const express = require('express');
 const cors = require('cors');
@@ -8,8 +8,11 @@ const cors = require('cors');
 const { NotFoundError } = require('./expressError');
 
 const { authenticateJWT } = require('./middleware/auth');
+// /auth
 const authRoutes = require('./routes/auth');
+// /users
 const usersRoutes = require('./routes/users');
+// /crops
 const cropsRoutes = require('./routes/crops');
 
 const morgan = require('morgan');
