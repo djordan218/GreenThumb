@@ -11,6 +11,11 @@ tags:
 
 I always plant something in my garden and have no idea what is "typical" after that. Not sure when to harvest, how long it takes for each seed to germinate, or just general information about a specific crop. This web app is meant to be a gardening manager. A user can add crops to their "garden", remove them, add crops to the database (as well as edit them and remove them.)
 
+## Site
+
+- I have the frontend deployed via AWS here: https://www.greenthumb-app.xyz/
+- Backend functionality still in progress.
+
 ## ✨ Features
 
 - HTML
