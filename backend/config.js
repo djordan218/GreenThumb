@@ -6,14 +6,18 @@ require('dotenv').config();
 require('colors');
 
 const SECRET_KEY = process.env.SECRET_KEY || 'secret-dev';
-
-const PORT = +process.env.PORT || 3001;
+const LOCAL_PORT = 3001;
+const PORT = +process.env.RDS_PORT || 3001;
+const DATABASE = process.env.RDS_DATABASE || 'green_thumb';
+const USER = process.env.RDS_USER || 'postgres';
+const HOST = process.env.RDS_HOST || '127.0.0.1';
+const PASSWORD = process.env.RDS_PASSWORD || 'password';
 
 // Use dev database, testing database, or via env var, production database
 function getDatabaseUri() {
   return process.env.NODE_ENV === 'test'
-    ? 'postgresql://postgres:password@127.0.0.1:5432/green_thumb_test'
-    : 'postgresql://postgres:password@127.0.0.1:5432/green_thumb';
+    ? 'postgres://postgres:password@127.0.0.1:5432/green_thumb_test'
+    : `postgres://${USER}:${PASSWORD}@${HOST}:${PORT}/${DATABASE}`;
 }
 
 // Speed up bcrypt during tests, since the algorithm safety isn't being tested
@@ -31,4 +35,5 @@ module.exports = {
   PORT,
   BCRYPT_WORK_FACTOR,
   getDatabaseUri,
+  LOCAL_PORT,
 };
