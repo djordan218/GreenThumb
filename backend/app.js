@@ -16,6 +16,7 @@ const usersRoutes = require('./routes/users');
 const cropsRoutes = require('./routes/crops');
 
 const morgan = require('morgan');
+const router = express.Router();
 
 const app = express();
 
@@ -31,6 +32,14 @@ app.use('/crops', cropsRoutes);
 /** Handle 404 errors -- this matches everything */
 app.use(function (req, res, next) {
   return next(new NotFoundError());
+});
+
+app.get('/', async function (req, res, next) {
+  try {
+    res.send('MAIN HOME PAGE');
+  } catch (err) {
+    return next(err);
+  }
 });
 
 /** Generic error handler; anything unhandled goes here. */
