@@ -15,7 +15,10 @@ I always plant something in my garden and have no idea what is "typical" after t
 ## Site
 
 - I have the frontend deployed via AWS here: https://www.greenthumb-app.xyz/
-- Backend functionality still in progress.
+  - S3 Bucket to Cloudfront for HTTPS
+- Backend deployed and hosted on AWS
+  - API Gateway using Lambda functions
+  - RDS Postgres (database)
 
 ## ✨ Features
 
@@ -26,6 +29,11 @@ I always plant something in my garden and have no idea what is "typical" after t
 - NodeJS
 - Reactstrap
 - SQLAlchemy
+- AWS Serverless Tech
+- S3
+- Cloudfront
+- API Gateway
+- Lambda
 
 ## 💁‍♀️ How to use
 
